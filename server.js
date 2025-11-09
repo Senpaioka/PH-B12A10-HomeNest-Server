@@ -1,4 +1,5 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const admin = require("firebase-admin");
 require('dotenv').config()
 const express = require('express');
 const app = express();
@@ -7,14 +8,52 @@ const uri = process.env.MONGODB_URI;
 const port = process.env.PORT || 8808;
 
 
+// firebase setup
+const serviceAccount = require("./homenest-firebase-adminsdk-secret-key.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+
 // middleware
 app.use(cors());
 app.use(express.json());
+
+
+// custom firebase middleware
+const firebaseVerificationToken = async (req, res, next) => {
+  const authorization = req.headers.authorization;
+
+  if (!authorization) {
+    return res.status(401).send({
+      message: "unauthorized access. Token not found!",
+    });
+  }
+
+  const token = authorization.split(" ")[1];
+
+  try {
+    await admin.auth().verifyIdToken(token);
+
+    // continue
+    next();
+
+  } catch (error) {
+    res.status(401).send({
+      message: "unauthorized access.",
+    });
+  }
+};
+
+
 
 // actions
 app.get('/', (req, res) => {
     res.send('HomeHest Server')
 })
+
+
 
 // MongoDB
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -35,14 +74,35 @@ async function run() {
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
+    
+    
     // database setup
     const database = client.db('home_nest_db');
     const user_collection = database.collection('users');
 
+    
+    
     // USER's API
-    app.post('/user', async(req, res) => {
+    app.post('/user', firebaseVerificationToken, async(req, res) => {
+        const newUser = req.body;
+        const email = req.body.email;
+        const query = {email : email};
+        const isUserAlreadyExists = await user_collection.findOne(query);
         
-    })
+        if (isUserAlreadyExists) {
+            res.send({ message: 'user already exits' })
+        } else {
+            newUser.created_at = new Date();
+            const result = await user_collection.insertOne(newUser);
+            res.send(result);
+        }
+    });
+
+
+
+
+
+
 
   } finally {
     // Ensures that the client will close when you finish/error
@@ -50,6 +110,8 @@ async function run() {
   }
 }
 run().catch(console.dir);
+
+
 
 
 // listening 
