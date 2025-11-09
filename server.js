@@ -34,7 +34,8 @@ const firebaseVerificationToken = async (req, res, next) => {
   const token = authorization.split(" ")[1];
 
   try {
-    await admin.auth().verifyIdToken(token);
+    const decode = await admin.auth().verifyIdToken(token);
+    req.user = decode;
 
     // continue
     next();
@@ -79,6 +80,7 @@ async function run() {
     // database setup
     const database = client.db('home_nest_db');
     const user_collection = database.collection('users');
+    const property_collection = database.collection('properties');
 
     
     
@@ -98,6 +100,30 @@ async function run() {
         }
     });
 
+
+
+
+    // PROPERTY's API
+    app.post('/properties', firebaseVerificationToken, async(req, res) => {
+
+      const newProperty = req.body;
+      const email = req.user.email || (await admin.auth().getUser(req.user.uid)).providerData[0].email;
+      
+      newProperty.userId = email;
+      newProperty.created_at = new Date();
+      
+      // saving to database
+      const result = await property_collection.insertOne(newProperty);
+      res.send(result);
+    });
+
+
+    app.get('/properties', async(req, res) => {
+
+      const result = await property_collection.find({}, {projection: {propertyName: 1, category: 1, price: 1} }).toArray();
+      res.send(result);
+
+    })
 
 
 
