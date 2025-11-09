@@ -126,7 +126,13 @@ async function run() {
     })
 
 
+    app.get('/my-submission', firebaseVerificationToken, async(req, res) => {
 
+      const email = req.user.email || (await admin.auth().getUser(req.user.uid)).providerData[0].email;
+      const query = {userId : email}
+      const result = await property_collection.find(query).toArray();
+      res.send(result);
+    })
 
 
 
