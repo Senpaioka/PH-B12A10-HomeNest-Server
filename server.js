@@ -108,7 +108,9 @@ async function run() {
 
       const newProperty = req.body;
       const email = req.user.email || (await admin.auth().getUser(req.user.uid)).providerData[0].email;
+      const username = req.user.displayName;
       
+      newProperty.username = username;
       newProperty.userId = email;
       newProperty.created_at = new Date();
       
@@ -120,7 +122,7 @@ async function run() {
 
     app.get('/properties', async(req, res) => {
 
-      const result = await property_collection.find({}, {projection: {propertyName: 1, category: 1, price: 1} }).toArray();
+      const result = await property_collection.find({}, {projection: {propertyName: 1, price: 1, location: 1, image: 1, category: 1, price: 1, userId: 1} }).toArray();
       res.send(result);
 
     })
