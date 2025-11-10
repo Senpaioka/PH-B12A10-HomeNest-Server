@@ -81,6 +81,7 @@ async function run() {
     const database = client.db('home_nest_db');
     const user_collection = database.collection('users');
     const property_collection = database.collection('properties');
+    const feedback_collection = database.collection('feedback');
 
     
     
@@ -158,6 +159,19 @@ async function run() {
     })
 
 
+
+    // FEEDBACK's API
+    app.post('/feedback', firebaseVerificationToken, async(req, res) => {
+      
+      const newFeedback = req.body;
+      const email = req.user.email || (await admin.auth().getUser(req.user.uid)).providerData[0].email;
+
+      newFeedback.userId = email;
+      newFeedback.created_at = new Date();
+      const result = await feedback_collection.insertOne(newFeedback);
+      res.send(result);
+
+    });
 
 
 
