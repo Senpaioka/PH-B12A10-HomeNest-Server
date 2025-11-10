@@ -128,6 +128,27 @@ async function run() {
     })
 
 
+    app.get('/properties/:propertyId', firebaseVerificationToken, async(req, res) => {
+      
+      // getting property info
+      const property_id = req.params.propertyId;
+      const params = { _id: new ObjectId(property_id) };
+      const property = await property_collection.findOne(params);
+
+      // getting user info
+      const user = await user_collection.findOne({ email: property.userId });
+
+      // combined both result
+      const result = {
+        ...property,
+        userInfo: user || null,
+      };
+
+      res.send(result);
+
+    })
+
+
     app.get('/my-submission', firebaseVerificationToken, async(req, res) => {
 
       const email = req.user.email || (await admin.auth().getUser(req.user.uid)).providerData[0].email;
@@ -135,6 +156,9 @@ async function run() {
       const result = await property_collection.find(query).toArray();
       res.send(result);
     })
+
+
+
 
 
 
