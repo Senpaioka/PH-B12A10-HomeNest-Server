@@ -166,9 +166,25 @@ async function run() {
       const newFeedback = req.body;
       const email = req.user.email || (await admin.auth().getUser(req.user.uid)).providerData[0].email;
 
+      newFeedback.username = req.user.name;
       newFeedback.userId = email;
       newFeedback.created_at = new Date();
       const result = await feedback_collection.insertOne(newFeedback);
+      res.send(result);
+
+    });
+
+
+    app.get('/feedback/:propertyId', async(req, res) => {
+
+      const property_id = req.params.propertyId;
+
+      const result = await feedback_collection.find(
+      { propertyId: property_id },                  // Filter (use propertyId instead of _id)
+      { projection: { userRating: 1, userComment: 1, username: 1, created_at: 1 } })
+      .sort({ created_at: -1 }) 
+      .toArray();
+
       res.send(result);
 
     });
