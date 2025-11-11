@@ -84,6 +84,9 @@ async function run() {
     const feedback_collection = database.collection('feedback');
 
     
+
+
+
     
     // USER's API
     app.post('/user', firebaseVerificationToken, async(req, res) => {
@@ -100,6 +103,7 @@ async function run() {
             res.send(result);
         }
     });
+
 
 
 
@@ -241,6 +245,10 @@ async function run() {
 
 
 
+
+
+
+
     // FEEDBACK's API
     app.post('/feedback', firebaseVerificationToken, async(req, res) => {
       
@@ -269,6 +277,63 @@ async function run() {
       res.send(result);
 
     });
+
+
+
+    app.get('/my-feedbacks', firebaseVerificationToken, async(req, res) => {
+
+      try {
+
+        const email = req.user.email || (await admin.auth().getUser(req.user.uid)).providerData[0].email;
+        
+        const feedbacks = await feedback_collection.aggregate([
+          // matching feedback by userId
+          { $match: {userId: email} },
+          // Convert propertyId string to ObjectId (if stored as string)
+          {
+            $addFields: {
+              propertyObjId: { $toObjectId: "$propertyId" }
+            }
+          },
+          // Lookup related property
+          {
+            $lookup: {
+              from: "properties",          // property collection name
+              localField: "propertyObjId",
+              foreignField: "_id",
+              as: "propertyInfo"
+            }
+          },
+          // Flatten the array
+          { $unwind: "$propertyInfo" },
+          // Optional: select only needed fields
+          {
+            $project: {
+              _id: 1,
+              userRating: 1,
+              userComment: 1,
+              username: 1,
+              propertyId: 1,
+              created_at: 1,
+              "propertyInfo.propertyName": 1,
+              "propertyInfo.category": 1,
+              "propertyInfo.price": 1,
+              "propertyInfo.location": 1,
+              "propertyInfo.image": 1
+            }
+          },
+          // Sort newest first
+          { $sort: { created_at: -1 } }
+
+        ]).toArray();
+
+        res.send(feedbacks);
+
+      } catch(error) {
+        console.error(error);
+        res.status(500).send({ message: "Internal server error" });
+      }
+    })
 
 
 
