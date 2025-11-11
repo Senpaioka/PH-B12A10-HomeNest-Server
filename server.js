@@ -123,7 +123,9 @@ async function run() {
 
     app.get('/properties', async(req, res) => {
 
-      const result = await property_collection.find({}, {projection: {propertyName: 1, price: 1, location: 1, image: 1, category: 1, price: 1, userId: 1} }).toArray();
+      const result = await property_collection.find({}, {projection: {propertyName: 1, price: 1, location: 1, image: 1, category: 1, price: 1, userId: 1} })
+      .sort({ created_at: -1 }) 
+      .toArray();
       res.send(result);
 
     })
@@ -191,7 +193,7 @@ async function run() {
 
       const email = req.user.email || (await admin.auth().getUser(req.user.uid)).providerData[0].email;
       const query = {userId : email}
-      const result = await property_collection.find(query).toArray();
+      const result = await property_collection.find(query).sort({ created_at: -1 }).toArray();
       res.send(result);
     })
 
