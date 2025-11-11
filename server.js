@@ -150,6 +150,43 @@ async function run() {
     })
 
 
+
+    app.delete('/properties/:propertyId', firebaseVerificationToken, async(req, res) => {
+
+      try {
+        const property_id = req.params.propertyId;
+        const email = req.user.email || (await admin.auth().getUser(req.user.uid)).providerData[0].email;
+
+        // validate ObjectId
+        if (!ObjectId.isValid(property_id)) {
+          return res.status(400).send({ message: "Invalid Property ID" })
+        }
+
+        // checking and filtering
+        const filter = {
+          _id: new ObjectId(property_id),
+          userId: email, // only delete if the logged-in user owns it
+        }
+
+        // deleting the document
+        const result = await property_collection.deleteOne(filter);
+
+        // confirming delete
+        if (result.deletedCount === 0) {
+          return res.status(404).send({ message: "Deletion abort!" })
+        }
+
+        res.send({ message: "Property Deleted Successfully.", result});
+
+      } catch (error) {
+        console.error("Error deleting property:", error);
+        res.status(500).send({ message: "Internal server error" });
+      }
+
+    })
+
+
+
     app.get('/my-submission', firebaseVerificationToken, async(req, res) => {
 
       const email = req.user.email || (await admin.auth().getUser(req.user.uid)).providerData[0].email;
