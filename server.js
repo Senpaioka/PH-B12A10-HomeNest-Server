@@ -339,6 +339,69 @@ async function run() {
 
 
 
+
+    // SORTING AND SEARCHING
+    app.get('/filtered', async (req, res) => {
+      
+      try {
+        // Extract sort options from query params
+        const sortBy = req.query.sort;  // Default sort field
+        const order = req.query.order === 'asc' ? 1 : -1; // Ascending or Descending
+
+        // Only allow valid sort fields (security)
+        const validSortFields = ['price', 'created_at', 'category'];
+        if (!validSortFields.includes(sortBy)) {
+          return res.status(400).send({ message: 'Invalid sort field' });
+        }
+
+        // Build sort object dynamically
+        const sortOptions = { [sortBy]: order };
+
+        // Fetch properties sorted by sortBy field
+        const result = await property_collection
+          .find({})
+          .sort(sortOptions)
+          .toArray();
+
+        res.send(result);
+      } catch (error) {
+        console.error('Error fetching sorted properties:', error);
+        res.status(500).send({ message: 'Internal server error' });
+      }
+    });
+
+
+
+
+    app.get('/searched', async (req, res) => {
+
+      try {
+          const { q } = req.query; // get search term from query param
+
+          if (!q) return res.status(400).send({ message: "Query is required" });
+
+          // Build a regex for case-insensitive partial match
+          const regex = new RegExp(q, 'i');
+
+          // Query MongoDB
+          const results = await property_collection
+             .find(
+                { propertyName: { $regex: regex } }, // filter
+                {projection: {propertyName: 1, price: 1, location: 1, image: 1, category: 1, price: 1, userId: 1} } // only these fields
+              )
+              .toArray();
+
+          res.send(results);
+
+        } 
+        catch (error) {
+          console.error("Search error:", error);
+          res.status(500).send({ message: "Internal server error" });
+        }
+    })
+
+
+
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
