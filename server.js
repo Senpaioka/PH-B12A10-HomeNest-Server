@@ -315,6 +315,7 @@ async function run() {
               username: 1,
               propertyId: 1,
               created_at: 1,
+              "propertyInfo._id": 1,
               "propertyInfo.propertyName": 1,
               "propertyInfo.category": 1,
               "propertyInfo.price": 1,
