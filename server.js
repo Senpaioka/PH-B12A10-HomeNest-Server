@@ -1,5 +1,5 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const admin = require("firebase-admin");
+const admin = require('./firebaseAdmin');
 require('dotenv').config()
 const express = require('express');
 const app = express();
@@ -9,11 +9,11 @@ const port = process.env.PORT || 8808;
 
 
 // firebase setup
-const serviceAccount = require("./homenest-firebase-adminsdk-secret-key.json");
+// const serviceAccount = require("./homenest-firebase-adminsdk-secret-key.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount)
+// });
 
 
 // middleware
