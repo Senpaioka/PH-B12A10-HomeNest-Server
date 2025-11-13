@@ -11,7 +11,6 @@ const port = process.env.PORT || 8808;
 // middleware
 app.use(cors({
   origin: [
-    'http://localhost:5173', // Your local client
     'https://ph-b12-a10-home-nest-client.vercel.app' // Your deployed client
   ],
   credentials: true,
