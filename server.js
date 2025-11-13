@@ -8,22 +8,17 @@ const uri = process.env.MONGODB_URI;
 const port = process.env.PORT || 8808;
 
 
-// firebase setup
-// const serviceAccount = require("./homenest-firebase-adminsdk-secret-key.json");
-
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount)
-// });
-
-
 // middleware
-// app.use(cors({
-//   origin: ["https://ph-b12-a10-home-nest-client.vercel.app"],
-//   methods: ["GET","POST","PATCH","DELETE"],
-//   credentials: true
-// }));
+app.use(cors({
+  origin: [
+    // "https://ph-b12-a10-home-nest-client.vercel.app", // production client
+    "http://localhost:5173" // local dev client
+  ],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  credentials: true
+}));
 
-app.cors(cors());
+// app.cors(cors());
 app.use(express.json());
 
 
