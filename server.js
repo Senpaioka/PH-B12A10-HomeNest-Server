@@ -17,7 +17,12 @@ const port = process.env.PORT || 8808;
 
 
 // middleware
-app.use(cors());
+app.use(cors({
+  origin: ["https://ph-b12-a10-home-nest-client.vercel.app/"],
+  methods: ["GET","POST","PATCH","DELETE"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 
