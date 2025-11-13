@@ -127,7 +127,7 @@ async function run() {
 
     app.get('/properties', async(req, res) => {
 
-      const result = await property_collection.find({}, {projection: {propertyName: 1, price: 1, location: 1, image: 1, category: 1, price: 1, userId: 1} })
+      const result = await property_collection.find({}, {projection: {propertyName: 1, price: 1, location: 1, image: 1, category: 1, description: 1, price: 1, userId: 1} })
       .sort({ created_at: -1 }) 
       .toArray();
       res.send(result);
