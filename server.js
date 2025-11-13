@@ -9,16 +9,16 @@ const port = process.env.PORT || 8808;
 
 
 // middleware
-// app.use(cors({
-//   origin: [
-//     // "https://ph-b12-a10-home-nest-client.vercel.app", // production client
-//     "http://localhost:5173" // local dev client
-//   ],
-//   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-//   credentials: true
-// }));
+app.use(cors({
+  origin: [
+    // "https://ph-b12-a10-home-nest-client.vercel.app", // production client
+    "http://localhost:5173" // local dev client
+  ],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  credentials: true
+}));
 
-app.cors(cors());
+// app.cors(cors());
 app.use(express.json());
 
 
@@ -73,8 +73,8 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
     
     
