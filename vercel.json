@@ -1,0 +1,16 @@
+{
+  "routes": [
+    {
+      "src": "/searched",
+      "dest": "/api/searched"
+    },
+    {
+      "src": "/api/searched",
+      "dest": "/api/searched"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/$1"
+    }
+  ]
+}
