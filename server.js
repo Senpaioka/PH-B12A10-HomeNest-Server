@@ -401,7 +401,7 @@ async function run() {
           const results = await property_collection
              .find(
                 { propertyName: { $regex: regex } }, // filter
-                {projection: {propertyName: 1, price: 1, location: 1, image: 1, category: 1, price: 1, userId: 1} } // only these fields
+                { projection: {propertyName: 1, price: 1, location: 1, image: 1, category: 1, description: 1, price: 1, userId: 1} }// only these fields
               )
               .toArray();
 
