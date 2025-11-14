@@ -71,10 +71,23 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
     // console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+
+    //listeners
+    client.connect()
+      .then(() => {
+        app.listen(port, () => {
+          console.log(`HomeNest server listening on: ${port}`);
+          console.log(`MongoDB Connected.`);
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
     
     
@@ -414,6 +427,6 @@ run().catch(console.dir);
 
 
 // listening 
-app.listen(port, () => {
-    console.log(`Server Running On Port: ${port}`);
-})
+// app.listen(port, () => {
+//     console.log(`Server Running On Port: ${port}`);
+// })
